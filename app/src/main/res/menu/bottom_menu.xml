@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/ic_home"
+        android:title="Home"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/shorts"
+        android:icon="@drawable/ic_shorts"
+        android:title="Shorts"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/subscription"
+        android:icon="@drawable/ic_subscription"
+        android:title="Subscription"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/liblary"
+        android:icon="@drawable/ic_liblary"
+        android:title="Subscription"
+        app:showAsAction="always" />
+</menu>

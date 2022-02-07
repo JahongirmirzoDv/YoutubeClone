@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:paddingBottom="15dp"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_launcher_background"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/image">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/channel_image"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_launcher_background"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/video_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_medium"
+                android:lineHeight="16.41sp"
+                android:maxEms="20"
+                android:maxLines="2"
+                android:paddingTop="10dp"
+                android:text="The Beauty of Existence - Heart Touching Nasheed"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                tools:ignore="RtlSymmetry"
+                tools:targetApi="p" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/channel_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Marvel Entertainment "
+                    android:textColor="@color/title"
+                    android:textSize="11sp"
+                    tools:ignore="RtlSymmetry" />
+
+                <TextView
+                    android:id="@+id/video_views"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="- 4.2K views "
+                    android:textColor="@color/title"
+                    android:textSize="11sp"
+                    app:layout_constraintLeft_toRightOf="@id/channel_name"
+                    app:layout_constraintTop_toBottomOf="@id/video_name"
+                    tools:ignore="RtlSymmetry" />
+
+                <TextView
+                    android:id="@+id/video_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="- 1 month ago"
+                    android:textColor="@color/title"
+                    android:textSize="11sp"
+                    app:layout_constraintLeft_toRightOf="@id/video_views"
+                    app:layout_constraintTop_toBottomOf="@id/video_name"
+                    tools:ignore="RtlSymmetry" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/dots"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:src="@drawable/ic_dots"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
