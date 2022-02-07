@@ -23,20 +23,20 @@ interface ApiService {
         @Query("maxResults") maxResults: Int = 10,
         @Query("part") part: String = "snippet",
         @Query("type") type: String = "video",
-        @Query("pageToken") pageToken: String,
+        @Query("pageToken") pageToken: String = "CAIQAA",
     ): YoutubeData
 
     @GET("videos")
     suspend fun getVideoDataById(
         @Query("id") id: String,
-        @Query("key") key: String,
+        @Query("key") key: String = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec",
         @Query("part") part: String = "snippet,contentDetails,statistics,status,localizations"
     ): StatisticItem
 
     @GET("channels")
     suspend fun getChannelById(
         @Query("id") id: String,
-        @Query("key") key: String,
+        @Query("key") key: String = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec",
         @Query("part") part: String = "snippet,contentDetails,statistics,status,brandingSettings"
     ): ChannelStatistics
 }

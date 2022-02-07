@@ -22,6 +22,8 @@ import com.example.youtubeclone.utils.PaginationScrollListener
 import com.example.youtubeclone.utils.ViewModelFactory
 import com.example.youtubeclone.viewmodels.ApiControlViewmodel
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
@@ -36,9 +38,8 @@ class MainActivity : AppCompatActivity() {
     private var isLastPage = false
     private var currentPage = 1
     private var TOTAL_PAGES = 10
+    private var pageToken1 = ""
 
-    var a2 = ArrayList<com.example.youtubeclone.models.statistic.Item>()
-    var a3 = listOf<com.example.youtubeclone.models.channel.Item>()
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         alltoone = ArrayList()
+        binding.progress.visibility = View.VISIBLE
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             WindowInsetsCompat.toWindowInsetsCompat(WindowInsets.CONSUMED)
@@ -55,36 +57,13 @@ class MainActivity : AppCompatActivity() {
         paginationAdapter = YoutubePagingRvAdapter(this@MainActivity)
 
 
-
-        GlobalScope.launch(Dispatchers.Main) {
-            val loadData = loadData("")
-//            val loadData2 = loadData2(loadData.items)
-//            val loadData3 = loadData3(loadData2)
-
-//            for (i in 0 until loadData.items.size) {
-//                alltoone.add(
-//                    AllToOne(
-//                        loadData2[i].id,
-//                        loadData.nextPageToken,
-//                        loadData2[i].snippet.thumbnails.high.url,
-//                        loadData2[i].snippet.title,
-//                        loadData3[i].brandingSettings.channel.title,
-//                        loadData2[i].statistics.viewCount,
-//                        loadData2[i].snippet.publishedAt,
-//                        loadData3[i].snippet.thumbnails.default.url,
-//                        loadData3[i].id
-//                    )
-//                )
-//            }
-        }
-
         binding.mainRv.addOnScrollListener(object :
             PaginationScrollListener(linearLayoutManager) {
             override fun loadMoreItems() {
                 isLoading = true
                 currentPage++
 
-//                loadNextPage()
+                loadNextPage()
             }
 
             override fun isLastPage(): Boolean {
@@ -97,80 +76,20 @@ class MainActivity : AppCompatActivity() {
         })
         binding.mainRv.layoutManager = linearLayoutManager
         binding.mainRv.adapter = paginationAdapter
-//        loadFirstPage()
+        loadFirstPage()
     }
 
     @OptIn(DelicateCoroutinesApi::class)
-//    private fun loadFirstPage() {
-//        GlobalScope.launch(Dispatchers.Main) {
-//            val loadData = loadData("")
-//            val loadData2 = loadData2(loadData.items)
-//            val loadData3 = loadData3(loadData2)
-//
-//            for (i in 0 until loadData.items.size) {
-//                alltoone.add(
-//                    AllToOne(
-//                        loadData2[i].id,
-//                        loadData.nextPageToken,
-//                        loadData2[i].snippet.thumbnails.high.url,
-//                        loadData2[i].snippet.title,
-//                        loadData3[i].brandingSettings.channel.title,
-//                        loadData2[i].statistics.viewCount,
-//                        loadData2[i].snippet.publishedAt,
-//                        loadData3[i].snippet.thumbnails.default.url,
-//                        loadData3[i].id
-//                    )
-//                )
-//            }
-//            paginationAdapter.addAll(alltoone)
-//        }
-//
-//        if (currentPage <= TOTAL_PAGES) {
-//            paginationAdapter.editLoading()
-//        } else {
-//            isLastPage = true
-//        }
-//    }
+    private fun loadFirstPage() {
+        var nextpagetoken = ""
 
-//    fun loadNextPage() {
-//        paginationAdapter.removeLoading()
-//        isLoading = false
-//        GlobalScope.launch(Dispatchers.Main) {
-//            val loadData = loadData(alltoone[0].pageToken.toString())
-//            val loadData2 = loadData2(loadData.items)
-//            val loadData3 = loadData3(loadData2)
-//
-//            for (i in 0 until loadData.items.size) {
-//                alltoone.add(
-//                    AllToOne(
-//                        loadData2[i].id,
-//                        loadData.nextPageToken,
-//                        loadData2[i].snippet.thumbnails.high.url,
-//                        loadData2[i].snippet.title,
-//                        loadData3[i].brandingSettings.channel.title,
-//                        loadData2[i].statistics.viewCount,
-//                        loadData2[i].snippet.publishedAt,
-//                        loadData3[i].snippet.thumbnails.default.url,
-//                        loadData3[i].id
-//                    )
-//                )
-//            }
-//            paginationAdapter.addAll(alltoone)
-//        }
-//
-//        paginationAdapter.addAll(alltoone)
-//
-//        if (currentPage <= TOTAL_PAGES) {
-//            paginationAdapter.editLoading()
-//        } else {
-//            isLastPage = true
-//        }
-//    }
-
-
-    suspend fun loadData(pageToken: String) {
-        withContext(Dispatchers.Main) {
-            ApiClient.apiService.getRandom(pageToken = pageToken).items.map {
+        GlobalScope.launch(Dispatchers.Main) {
+            var a2 = ArrayList<com.example.youtubeclone.models.statistic.Item>()
+            var a3 = listOf<com.example.youtubeclone.models.channel.Item>()
+            async {
+                nextpagetoken = ApiClient.apiService.getRandom(pageToken = "").nextPageToken
+            }
+            ApiClient.apiService.getRandom(pageToken = "").items.map {
                 a2.addAll(
                     ApiClient.apiService.getVideoDataById(
                         id = it.id.videoId,
@@ -178,44 +97,100 @@ class MainActivity : AppCompatActivity() {
                     ).items
                 )
             }
-        }
-        a3 = a2.flatMap {
-            ApiClient.apiService.getChannelById(
-                id = it.snippet.channelId,
-                key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-            ).items
-        }
-        Log.e(TAG, "loadDatasize: ${a2.size}")
-        Log.e(TAG, "loadDatasize: ${a3.size}")
-    }
 
-    suspend fun loadData2(n1: List<Item>): ArrayList<com.example.youtubeclone.models.statistic.Item> {
-        withContext(Dispatchers.Main) {
-            for (i in n1) {
-                a2.addAll(
-                    ApiClient.apiService.getVideoDataById(
-                        id = i.id.videoId,
-                        key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-                    ).items
+            a3 = a2.flatMap {
+                ApiClient.apiService.getChannelById(
+                    id = it.snippet.channelId,
+                    key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
+                ).items
+            }
+            Log.e(TAG, "1a2: ${a2.size}")
+            Log.e(TAG, "1a3: ${a3.size}")
+
+            for (i in 0 until a2.size) {
+                alltoone.add(
+                    AllToOne(
+                        a2[i].id,
+                        nextpagetoken,
+                        a2[i].snippet.thumbnails.high.url,
+                        a2[i].snippet.title,
+                        a3[i].brandingSettings.channel.title,
+                        a2[i].statistics.viewCount,
+                        a2[i].snippet.publishedAt,
+                        a3[i].snippet.thumbnails.default.url,
+                        a3[i].id
+                    )
                 )
             }
         }
-        return a2
+        paginationAdapter.addAll(alltoone)
+        paginationAdapter.notifyDataSetChanged()
+        binding.progress.visibility = View.INVISIBLE
+
+        Log.e(TAG, "loadFirstPage: ${alltoone}")
+
+        if (currentPage <= TOTAL_PAGES) {
+            paginationAdapter.editLoading()
+        } else {
+            isLastPage = true
+        }
     }
 
-//    suspend fun loadData3(n1: List<com.example.youtubeclone.models.statistic.Item>): ArrayList<com.example.youtubeclone.models.channel.Item> {
-//        withContext(Dispatchers.Main) {
-//            for (i in n1) {
-//                a3.addAll(
-//                    ApiClient.apiService.getChannelById(
-//                        id = i.snippet.channelId,
-//                        key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-//                    ).items
-//                )
-//            }
-//        }
-//        return a3
-//    }
+    fun loadNextPage() {
+        paginationAdapter.removeLoading()
+        isLoading = false
+        var nextpagetoken = ""
+        GlobalScope.launch(Dispatchers.Main) {
+          async{
+              var a2 = ArrayList<com.example.youtubeclone.models.statistic.Item>()
+              var a3 = listOf<com.example.youtubeclone.models.channel.Item>()
+              async {
+                  nextpagetoken = ApiClient.apiService.getRandom(pageToken = "").nextPageToken
+              }.await()
+              ApiClient.apiService.getRandom(pageToken = nextpagetoken).items.map {
+                  a2.addAll(
+                      ApiClient.apiService.getVideoDataById(
+                          id = it.id.videoId,
+                          key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
+                      ).items
+                  )
+              }
+
+              a3 = a2.flatMap {
+                  ApiClient.apiService.getChannelById(
+                      id = it.snippet.channelId,
+                      key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
+                  ).items
+              }
+              Log.e(TAG, "a2: ${a2.size}")
+              Log.e(TAG, "a3: ${a3.size}")
+
+              for (i in 0 until a2.size) {
+                  alltoone.add(
+                      AllToOne(
+                          a2[i].id,
+                          nextpagetoken,
+                          a2[i].snippet.thumbnails.high.url,
+                          a2[i].snippet.title,
+                          a3[i].brandingSettings.channel.title,
+                          a2[i].statistics.viewCount,
+                          a2[i].snippet.publishedAt,
+                          a3[i].snippet.thumbnails.default.url,
+                          a3[i].id
+                      )
+                  )
+              }
+          }.await()
+            paginationAdapter.addAll(alltoone)
+        }
+
+
+        if (currentPage <= TOTAL_PAGES) {
+            paginationAdapter.editLoading()
+        } else {
+            isLastPage = true
+        }
+    }
 
     private fun setupViewmodel() {
         viewModel = ViewModelProvider(
@@ -225,35 +200,4 @@ class MainActivity : AppCompatActivity() {
             )
         )[ApiControlViewmodel::class.java]
     }
-
-//    for (k in a2!!) {
-//        viewModel.getChannelById(k.id).observe(this@MainActivity) {
-//            when (it.status) {
-//                Status.SUCCESS -> {
-//                    Log.d(TAG, "succes: ${it.data}")
-//                    a3 = it.data?.items
-//                    for (m in 0 until a1!!.size) {
-//                        alltoone.add(
-//                            AllToOne(
-//                                a2!![m].id,
-//                                a2!![m].snippet.thumbnails.high.url,
-//                                a2!![m].snippet.title,
-//                                a3!![m].brandingSettings.channel.title,
-//                                a2!![m].statistics.viewCount,
-//                                a2!![m].snippet.publishedAt,
-//                                a3!![m].snippet.thumbnails.default.url,
-//                                a3!![m].id
-//                            )
-//                        )
-//                    }
-//                }
-//                Status.LOADING -> {
-//                    Log.d(TAG, "loadData: loading...")
-//                }
-//                Status.ERROR -> {
-//                    Log.d(TAG, "error: ${it.message}")
-//                }
-//            }
-//        }
-//    }
 }
