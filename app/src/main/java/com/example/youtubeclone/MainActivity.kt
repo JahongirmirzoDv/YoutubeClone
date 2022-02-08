@@ -22,6 +22,10 @@ import com.example.youtubeclone.utils.PaginationScrollListener
 import com.example.youtubeclone.utils.ViewModelFactory
 import com.example.youtubeclone.viewmodels.ApiControlViewmodel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -81,54 +85,13 @@ class MainActivity : AppCompatActivity() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun loadFirstPage() {
-        var nextpagetoken = ""
+       GlobalScope.launch(Dispatchers.Main) {
+           val randomVideo = async { viewModel.getRandomVideo() }.await()
+           paginationAdapter.addAll(randomVideo)
+           binding.progress.visibility = View.INVISIBLE
 
-        GlobalScope.launch(Dispatchers.Main) {
-            var a2 = ArrayList<com.example.youtubeclone.models.statistic.Item>()
-            var a3 = listOf<com.example.youtubeclone.models.channel.Item>()
-            async {
-                nextpagetoken = ApiClient.apiService.getRandom(pageToken = "").nextPageToken
-            }
-            ApiClient.apiService.getRandom(pageToken = "").items.map {
-                a2.addAll(
-                    ApiClient.apiService.getVideoDataById(
-                        id = it.id.videoId,
-                        key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-                    ).items
-                )
-            }
-
-            a3 = a2.flatMap {
-                ApiClient.apiService.getChannelById(
-                    id = it.snippet.channelId,
-                    key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-                ).items
-            }
-            Log.e(TAG, "1a2: ${a2.size}")
-            Log.e(TAG, "1a3: ${a3.size}")
-
-            for (i in 0 until a2.size) {
-                alltoone.add(
-                    AllToOne(
-                        a2[i].id,
-                        nextpagetoken,
-                        a2[i].snippet.thumbnails.high.url,
-                        a2[i].snippet.title,
-                        a3[i].brandingSettings.channel.title,
-                        a2[i].statistics.viewCount,
-                        a2[i].snippet.publishedAt,
-                        a3[i].snippet.thumbnails.default.url,
-                        a3[i].id
-                    )
-                )
-            }
-        }
-        paginationAdapter.addAll(alltoone)
-        paginationAdapter.notifyDataSetChanged()
-        binding.progress.visibility = View.INVISIBLE
-
-        Log.e(TAG, "loadFirstPage: ${alltoone}")
-
+           Log.e(TAG, "random: ${randomVideo}")
+       }
         if (currentPage <= TOTAL_PAGES) {
             paginationAdapter.editLoading()
         } else {
@@ -136,54 +99,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun loadNextPage() {
         paginationAdapter.removeLoading()
         isLoading = false
         var nextpagetoken = ""
-        GlobalScope.launch(Dispatchers.Main) {
-          async{
-              var a2 = ArrayList<com.example.youtubeclone.models.statistic.Item>()
-              var a3 = listOf<com.example.youtubeclone.models.channel.Item>()
-              async {
-                  nextpagetoken = ApiClient.apiService.getRandom(pageToken = "").nextPageToken
-              }.await()
-              ApiClient.apiService.getRandom(pageToken = nextpagetoken).items.map {
-                  a2.addAll(
-                      ApiClient.apiService.getVideoDataById(
-                          id = it.id.videoId,
-                          key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-                      ).items
-                  )
-              }
-
-              a3 = a2.flatMap {
-                  ApiClient.apiService.getChannelById(
-                      id = it.snippet.channelId,
-                      key = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec"
-                  ).items
-              }
-              Log.e(TAG, "a2: ${a2.size}")
-              Log.e(TAG, "a3: ${a3.size}")
-
-              for (i in 0 until a2.size) {
-                  alltoone.add(
-                      AllToOne(
-                          a2[i].id,
-                          nextpagetoken,
-                          a2[i].snippet.thumbnails.high.url,
-                          a2[i].snippet.title,
-                          a3[i].brandingSettings.channel.title,
-                          a2[i].statistics.viewCount,
-                          a2[i].snippet.publishedAt,
-                          a3[i].snippet.thumbnails.default.url,
-                          a3[i].id
-                      )
-                  )
-              }
-          }.await()
-            paginationAdapter.addAll(alltoone)
-        }
-
+        val randomVideo = viewModel.getRandomVideo()
+        paginationAdapter.addAll(randomVideo)
 
         if (currentPage <= TOTAL_PAGES) {
             paginationAdapter.editLoading()

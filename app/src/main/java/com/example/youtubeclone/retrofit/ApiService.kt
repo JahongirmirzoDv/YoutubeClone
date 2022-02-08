@@ -3,6 +3,7 @@ package com.example.youtubeclone.retrofit
 import com.example.youtubeclone.models.YoutubeData
 import com.example.youtubeclone.models.channel.ChannelStatistics
 import com.example.youtubeclone.models.statistic.StatisticItem
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -24,19 +25,19 @@ interface ApiService {
         @Query("part") part: String = "snippet",
         @Query("type") type: String = "video",
         @Query("pageToken") pageToken: String = "CAIQAA",
-    ): YoutubeData
+    ): Flow<YoutubeData>
 
     @GET("videos")
     suspend fun getVideoDataById(
         @Query("id") id: String,
         @Query("key") key: String = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec",
         @Query("part") part: String = "snippet,contentDetails,statistics,status,localizations"
-    ): StatisticItem
+    ): Flow<StatisticItem>
 
     @GET("channels")
     suspend fun getChannelById(
         @Query("id") id: String,
         @Query("key") key: String = "AIzaSyBdj_NiLtAOPPqniO2_K56QB4IAhAHrPec",
         @Query("part") part: String = "snippet,contentDetails,statistics,status,brandingSettings"
-    ): ChannelStatistics
+    ): Flow<ChannelStatistics>
 }
